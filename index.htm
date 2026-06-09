@@ -3,11 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F2 // ANALYTICAL PREDICTION MATRIX</title>
+    <title>F2 // ANALİTİK TAHMİN MATRİSİ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'JetBrains Mono', monospace; background-color: #030712; }
+        body { font-family: 'JetBrains Mono', monospace; background-color: #030712; position: relative; }
+
+        /* 1. Dünya Kupası Arka Plan Konfigürasyonu (%30 Opaklık) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3; /* Tam olarak %30 Opaklık */
+            z-index: -10; /* Tüm UI bileşenlerinin arkasına kilitlendi */
+            pointer-events: none;
+        }
+
         .glow-green { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
         .glow-amber { box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
         .surprise-flash { animation: flash-intel 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -21,89 +39,162 @@
 
     <div class="max-w-6xl mx-auto space-y-6">
 
-        <!-- SYSTEM HEADER -->
-        <div class="border border-slate-800 bg-slate-900/40 backdrop-blur p-6 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 glow-green">
+        <div class="border border-slate-800 bg-slate-900/60 backdrop-blur p-6 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 glow-green">
             <div class="space-y-1">
                 <div class="flex items-center space-x-3">
                     <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <h1 class="text-lg font-bold tracking-wider text-white">FUTBOL 2 // PREDICTION CORE v2.6</h1>
+                    <h1 class="text-lg font-bold tracking-wider text-white">FUTBOL 2 // TAHMİN ÇEKİRDEĞİ v2.6</h1>
                 </div>
                 <div class="text-xs text-slate-500 flex items-center space-x-4">
-                    <span>SYS_STATUS: ACTIVE</span>
+                    <span>SİST_DURUMU: AKTİF</span>
                     <span>|</span>
-                    <span id="sys-mode">MODE: RATIONAL_MATRIX</span>
+                    <span id="sys-mode">MOD: RASYONEL_MATRİS</span>
                 </div>
             </div>
 
-            <!-- CONTROLLER BUTTON -->
             <button id="btn-surprise" onclick="triggerSurpriseEngine()" class="bg-transparent border border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-950 font-bold tracking-widest text-xs px-5 py-3 rounded-lg transition-all duration-200 cursor-pointer uppercase glow-amber flex items-center space-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <span>[ EXECUTE_SURPRISE_SIM ]</span>
+                <span>[ SÜRPRİZ_SİMÜLASYONUNU_ÇALIŞTIR ]</span>
             </button>
         </div>
 
-        <!-- MATRIX DATA TABLE -->
-        <div class="border border-slate-800 bg-slate-900/20 rounded-xl overflow-hidden shadow-2xl">
+        <div class="border border-slate-800 bg-slate-900/40 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="border-b border-slate-800 bg-slate-950/60 text-slate-500 uppercase tracking-wider">
+                        <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-500 uppercase tracking-wider">
                             <th class="p-4 font-semibold text-center w-16">GRP</th>
-                            <th class="p-4 font-semibold w-24">DATE</th>
-                            <th class="p-4 font-semibold">MATCH MATCH-UP</th>
-                            <th class="p-4 font-semibold text-center w-28">HALF TIME</th>
-                            <th class="p-4 font-semibold text-center w-24">PRED_SCORE</th>
-                            <th class="p-4 font-semibold text-center w-20">RES</th>
-                            <th class="p-4 font-semibold text-center w-24">SIG_TYPE</th>
+                            <th class="p-4 font-semibold w-24">TARİH</th>
+                            <th class="p-4 font-semibold">MAÇ EŞLEŞMESİ (ANALİZ İÇİN SATIRA TIKLAYIN)</th>
+                            <th class="p-4 font-semibold text-center w-28">İLK YARI</th>
+                            <th class="p-4 font-semibold text-center w-24">TAHMİN_SKOR</th>
+                            <th class="p-4 font-semibold text-center w-20">SND</th>
+                            <th class="p-4 font-semibold text-center w-24">SİNYAL_TİPİ</th>
                         </tr>
                     </thead>
                     <tbody id="matrix-rows" class="divide-y divide-slate-800/40 font-medium">
-                        <!-- Data injected dynamic -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- SYSTEM FOOTER SYSTEM -->
+        <div class="border border-slate-800/80 bg-slate-950/60 backdrop-blur p-6 rounded-xl space-y-4 shadow-xl">
+            <div class="flex items-center space-x-2 border-b border-slate-800 pb-2">
+                <div class="h-1.5 w-1.5 rounded-full bg-blue-400"></div>
+                <h2 class="text-xs font-bold tracking-widest text-blue-400 uppercase">CORE_LOGS // MATRİS DÜŞÜNME VE ANALİZ SÜREÇLERİ</h2>
+            </div>
+
+            <ul class="space-y-3 text-xs text-slate-400 list-none font-mono">
+                <li class="flex items-start space-x-2">
+                    <span class="text-emerald-500 font-bold select-none">[✓]</span>
+                    <span><strong>Taktiksel ve Geometrik Alan Analizi:</strong> Takımların saha içi yayılımları, yarım alan (half-space) verimlilikleri, yüksek/alçak blok savunma yerleşimleri ve merkezi koridor daraltma metrikleri öncelikli olarak işlenir.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="text-emerald-500 font-bold select-none">[✓]</span>
+                    <span><strong>Geçiş Dinamikleri ve Tempo Kontrolü:</strong> Kontra atak frekansları, kanat oyuncularının patlayıcı hız (pacing) endeksleri ve takımların oyunu kendi dikte ettikleri tempoda tutma kararlılıkları ölçülür.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="text-emerald-500 font-bold select-none">[✓]</span>
+                    <span><strong>Fiziksel ve Kalitatif Üstünlükler:</strong> Hava topu mücadele başarı oranları, ikili mücadele dirençleri, duran top varyasyonlarındaki dönüşüm yüzdeleri ve takımların kilit oyuncularının bireysel teknik baskınlık (override) kapasiteleri ağırlıklandırılır.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="text-emerald-500 font-bold select-none">[✓]</span>
+                    <span><strong>Çevresel ve Konumsal Değişkenler:</strong> Maçın oynanacağı lokasyondaki yüksek rakım performansı, ekstrem sıcaklık değerleri ve nem endekslerinin, takımların pres mekanizmaları ile enerji tüketim hatlarına olan anlık etkileri simüle edilir.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="text-amber-500 font-bold select-none">[!]</span>
+                    <span><strong>Hibrit Anomali Modifikasyonu:</strong> Erken şok gol senaryoları, majör turnuvalardaki ekstrem rotasyon riskleri, takımların bitiricilik metriklerindeki anlık sapmalar ve psikolojik baskı eşikleri rasyonel veriye anomali (%50 Sürpriz) çarpanı olarak entegre edilir.</span>
+                </li>
+            </ul>
+        </div>
+
         <div class="flex justify-between items-center text-[10px] text-slate-600 tracking-widest px-2">
-            <span>DATA_LOAD: 24_NODES_PROCESSED</span>
-            <span>SECURE_CONNECTION // CORRELATION_ENGINE</span>
+            <span>VERİ_YÜKÜ: 24_DÜĞÜM_İŞLENDİ</span>
+            <span>GÜVENLİ_BAĞLANTI // KORELASYON_MOTORU</span>
+        </div>
+    </div>
+
+    <div id="reasoning-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0" onclick="closeReasoningModal()">
+        <div class="bg-slate-900 border-2 border-emerald-500/50 max-w-lg w-full rounded-xl p-6 shadow-2xl space-y-4 font-mono text-xs text-slate-300 glow-green transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span id="modal-badge" class="px-2 py-0.5 rounded text-[10px] font-bold">MOD: ANALİZ</span>
+                    <h3 id="modal-heading" class="text-white font-bold tracking-wide">MAÇ İSTİHBARATI</h3>
+                </div>
+                <button onclick="closeReasoningModal()" class="text-slate-500 hover:text-white transition-colors">&times; KAPAT</button>
+            </div>
+            <div>
+                <p class="text-slate-500 uppercase tracking-widest text-[10px] mb-1">HEDEF DÜĞÜMLER</p>
+                <div id="modal-teams" class="text-sm font-bold text-white tracking-wide">Ev Sahibi vs Deplasman</div>
+            </div>
+            <div>
+                <p class="text-slate-500 uppercase tracking-widest text-[10px] mb-1">STRATEJİK TAHMİN VERİLERİ</p>
+                <div class="bg-slate-950/60 p-3 rounded border border-slate-800 flex justify-between items-center text-center">
+                    <div>
+                        <span class="block text-slate-500 text-[9px]">İLK YARI</span>
+                        <span id="modal-ht" class="text-slate-300 font-bold font-mono">0-0</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 text-[9px]">TAHMİN SKORU</span>
+                        <span id="modal-score" class="text-emerald-400 font-bold font-mono text-sm">0-0</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 text-[9px]">SONUÇ</span>
+                        <span id="modal-res" class="text-slate-300 font-bold font-mono">X</span>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <p class="text-slate-500 uppercase tracking-widest text-[10px]">ALGORİTMİK GEREKÇELENDİRME</p>
+                <p id="modal-text" class="text-slate-300 leading-relaxed bg-slate-950/40 p-4 border border-slate-800/60 rounded">
+                    Analiz yükü başlatılması bekleniyor...
+                </p>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeReasoningModal()" class="w-full bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/30 hover:text-slate-950 text-emerald-400 font-bold py-2 rounded transition-all duration-200 uppercase tracking-wider text-[11px]">
+                    İstihbaratı Onayla
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Türkçe Taktik Gerekçelendirme Veri Havuzu ile Güncellenmiş Maç Matrisi
         const dataset = [
-            { id: 1, g: "A", d: "11.06", h: "Meksika", a: "Güney Afrika", rat: { s: "2-1", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "1-1", ht: "0-1", r: "X", t: "ANOM" } },
-            { id: 2, g: "A", d: "11.06", h: "Güney Kore", a: "Çekya", rat: { s: "1-1", ht: "0-0", r: "X", t: "NORM" }, sur: { s: "1-2", ht: "1-1", r: "2", t: "ANOM" } },
-            { id: 3, g: "B", d: "12.06", h: "Kanada", a: "Bosna Hersek", rat: { s: "2-0", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "1-1", ht: "0-0", r: "X", t: "ANOM" } },
-            { id: 4, g: "B", d: "13.06", h: "Katar", a: "İsviçre", rat: { s: "0-2", ht: "0-1", r: "2", t: "NORM" }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM" } },
-            { id: 5, g: "C", d: "13.06", h: "Haiti", a: "İskoçya", rat: { s: "1-2", ht: "0-1", r: "2", t: "NORM" }, sur: { s: "2-2", ht: "1-1", r: "X", t: "ANOM" } },
-            { id: 6, g: "C", d: "13.06", h: "Brezilya", a: "Fas", rat: { s: "2-1", ht: "1-1", r: "1", t: "NORM" }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM" } },
-            { id: 7, g: "D", d: "12.06", h: "ABD", a: "Paraguay", rat: { s: "2-0", ht: "0-0", r: "1", t: "NORM" }, sur: { s: "0-1", ht: "0-1", r: "2", t: "ANOM" } },
-            { id: 8, g: "D", d: "14.06", h: "Avustralya", a: "Türkiye", rat: { s: "1-2", ht: "0-1", r: "2", t: "NORM" }, sur: { s: "2-2", ht: "2-0", r: "X", t: "ANOM" } },
-            { id: 9, g: "E", d: "14.06", h: "Almanya", a: "Curaçao", rat: { s: "4-0", ht: "2-0", r: "1", t: "NORM" }, sur: { s: "2-1", ht: "0-0", r: "1", t: "ANOM" } },
-            { id: 10, g: "E", d: "14.06", h: "Fildişi Sahili", a: "Ekvador", rat: { s: "1-1", ht: "1-0", r: "X", t: "NORM" }, sur: { s: "1-2", ht: "0-1", r: "2", t: "ANOM" } },
-            { id: 11, g: "F", d: "14.06", h: "Hollanda", a: "Japonya", rat: { s: "2-2", ht: "1-1", r: "X", t: "NORM" }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM" } },
-            { id: 12, g: "F", d: "15.06", h: "İsveç", a: "Tunus", rat: { s: "2-1", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "0-0", ht: "0-0", r: "X", t: "ANOM" } },
-            { id: 13, g: "G", d: "15.06", h: "İran", a: "Yeni Zelanda", rat: { s: "1-0", ht: "0-0", r: "1", t: "NORM" }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM" } },
-            { id: 14, g: "G", d: "15.06", h: "Belçika", a: "Mısır", rat: { s: "2-1", ht: "1-1", r: "1", t: "NORM" }, sur: { s: "1-2", ht: "0-1", r: "2", t: "ANOM" } },
-            { id: 15, g: "H", d: "15.06", h: "İspanya", a: "Yeşil Burun Ad.", rat: { s: "3-0", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "1-1", ht: "0-0", r: "X", t: "ANOM" } },
-            { id: 16, g: "H", d: "15.06", h: "Suudi Arabistan", a: "Uruguay", rat: { s: "0-2", ht: "0-1", r: "2", t: "NORM" }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM" } },
-            { id: 17, g: "I", d: "16.06", h: "Fransa", a: "Senegal", rat: { s: "2-0", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "1-1", ht: "0-1", r: "X", t: "ANOM" } },
-            { id: 18, g: "I", d: "16.06", h: "Irak", a: "Norveç", rat: { s: "0-3", ht: "0-2", r: "2", t: "NORM" }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM" } },
-            { id: 19, g: "J", d: "16.06", h: "Arjantin", a: "Cezayir", rat: { s: "3-1", ht: "2-0", r: "1", t: "NORM" }, sur: { s: "2-2", ht: "1-1", r: "X", t: "ANOM" } },
-            { id: 20, g: "J", d: "16.06", h: "Avusturya", a: "Ürdün", rat: { s: "2-0", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "1-1", ht: "0-0", r: "X", t: "ANOM" } },
-            { id: 21, g: "K", d: "17.06", h: "Portekiz", a: "Kongo DC", rat: { s: "3-1", ht: "1-1", r: "1", t: "NORM" }, sur: { s: "2-2", ht: "1-2", r: "X", t: "ANOM" } },
-            { id: 22, g: "K", d: "17.06", h: "Özbekistan", a: "Kolombiya", rat: { s: "0-2", ht: "0-1", r: "2", t: "NORM" }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM" } },
-            { id: 23, g: "L", d: "17.06", h: "Gana", a: "Panama", rat: { s: "2-1", ht: "1-0", r: "1", t: "NORM" }, sur: { s: "1-2", ht: "0-1", r: "2", t: "ANOM" } },
-            { id: 24, g: "L", d: "17.06", h: "İngiltere", a: "Hırvatistan", rat: { s: "1-1", ht: "0-0", r: "X", t: "NORM" }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM" } }
+            { id: 1, g: "A", d: "11.06", h: "Meksika", a: "Güney Afrika", rat: { s: "2-1", ht: "1-0", r: "1", t: "NORM", reason: "Meksika yüksek rakımlı sahalarda tempoyu etkili bir şekilde kontrol ediyor. Kanatlarda yapısal aşırı yüklenme bekleniyor." }, sur: { s: "1-1", ht: "0-1", r: "X", t: "ANOM", reason: "Yüksek nem kaynaklı yapısal çöküş. Güney Afrika, stoper boşluğundan yararlanan dikey hat geçişleriyle karşılık veriyor." } },
+            { id: 2, g: "A", d: "11.06", h: "Güney Kore", a: "Çekya", rat: { s: "1-1", ht: "0-0", r: "X", t: "NORM", reason: "Taktiksel kilitlenme bekleniyor. Orta saha baskı matrisleri savunma pivotlarında eşit şekilde dengeleniyor." }, sur: { s: "1-2", ht: "1-1", r: "2", t: "ANOM", reason: "Güney Kore'de hava topu mücadelesi eksikliği tespit edildi. Çek Cumhuriyeti yoğun duran top organizasyonlarına geçiş yapıyor." } },
+            { id: 3, g: "B", d: "12.06", h: "Kanada", a: "Bosna Hersek", rat: { s: "2-0", ht: "1-0", r: "1", t: "NORM", reason: "Kanada, ekstrem dinamik kanat temposuyla geçişleri maksimize ediyor. Bosna'dan düşük blok hataları bekleniyor." }, sur: { s: "1-1", ht: "0-0", r: "X", t: "ANOM", reason: "Bosna ultra yoğun bir merkezi kümelenme uyguluyor. Kanada, topla oynama endeksine rağmen gol çevrim metriklerinde başarısız oluyor." } },
+            { id: 4, g: "B", d: "13.06", h: "Katar", a: "İsviçre", rat: { s: "0-2", ht: "0-1", r: "2", t: "NORM", reason: "İsviçre, orta blok konfigürasyonlarında üstün taktik disiplin sergiliyor. Yerel oyun kurma parametrelerini boğuyor." }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM", reason: "Aşırı yerel çevresel sıcaklık endeksleri, İsviçre'nin son 30 dakikadaki baskı çıkışını olumsuz etkiliyor." } },
+            { id: 5, g: "C", d: "13.06", h: "Haiti", a: "İskoçya", rat: { s: "1-2", ht: "0-1", r: "2", t: "NORM", reason: "İskoçya, orta saha alanlarında fiziksel üstünlük metrikleriyle yapısal savaşları kazanıyor." }, sur: { s: "2-2", ht: "1-1", r: "X", t: "ANOM", reason: "Karşı atak serilerinde İskoçya'nın yapısal rotasyon hatlarında savunma konumlandırma sistem hataları." } },
+            { id: 6, g: "C", d: "13.06", h: "Brezilya", a: "Fas", rat: { s: "2-1", ht: "1-1", r: "1", t: "NORM", reason: "Brezilya bireysel teknik üstünlüklere sahip. Dizilim metrikleri sekansın sonlarında yukarı kayıyor." }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM", reason: "Fas, üst düzey geçiş tuzakları uygulayarak Brezilya'nın önde basan bek dizilimini tamamen açığa çıkarıyor." } },
+            { id: 7, g: "D", d: "12.06", h: "ABD", a: "Paraguay", rat: { s: "2-0", ht: "0-0", r: "1", t: "NORM", reason: "ABD, modern akışkan hücum yolları sırasında yoğun iç forvet kaymalarıyla yarım alan ceplerinden yararlanıyor." }, sur: { s: "0-1", ht: "0-1", r: "2", t: "ANOM", reason: "Paraguay, erken bir korner golü kapmak için fiziksel standart operasyonları kullanarak kırılmaz bir düşük savunma duvarı kilitliyor." } },
+            { id: 8, g: "D", d: "14.06", h: "Avustralya", a: "Türkiye", rat: { s: "1-2", ht: "0-1", r: "2", t: "NORM", reason: "Türkiye, merkezi hatları temizlemek için derin oyun kurucular vasıtasıyla üstün yaratıcı dağıtım vektörleri uyguluyor." }, sur: { s: "2-2", ht: "2-0", r: "X", t: "ANOM", reason: "Avustralya, erken Türk oyun kurma kalıplarını çökerterek yoğun yapısal baskı profilleri başlatıyor." } },
+            { id: 9, g: "E", d: "14.06", h: "Almanya", a: "Curaçao", rat: { s: "4-0", ht: "2-0", r: "1", t: "NORM", reason: "Almanya, haritadaki her çeyrekte mutlak mekanik ve kalitatif üstünlüğü koruyor." }, sur: { s: "2-1", ht: "0-0", r: "1", t: "ANOM", reason: "Almanya ekstrem rotasyon konfigürasyonlarına gidiyor. Curaçao derin dizilimle gol farkını minimize ediyor." } },
+            { id: 10, g: "E", d: "14.06", h: "Fildişi Sahili", a: "Ekvador", rat: { s: "1-1", ht: "1-0", r: "X", t: "NORM", reason: "Eşit çarpışma profilleri. Fiziksel sağlamlık matrisi, geçiş temposu metriklerini dengeliyor." }, sur: { s: "1-2", ht: "0-1", r: "2", t: "ANOM", reason: "Ekvador, üst üste binen kanallarda son derece işlevsel aşırı yükleme mekanizmaları kullanarak yanal alanları sömürüyor." } },
+            { id: 11, g: "F", d: "14.06", h: "Hollanda", a: "Japonya", rat: { s: "2-2", ht: "1-1", r: "X", t: "NORM", reason: "Seçkin felsefelerin çarpışması. Hollanda'nın pozisyonel geometrisi, yoğun, yüksek frekanslı kinetik Japon takibiyle buluşuyor." }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM", reason: "Japonya'nın alansal takip verimliliği, son bölümde Hollanda'nın hedef santrfor erişim protokollerini minimize ediyor." } },
+            { id: 12, g: "F", d: "15.06", h: "İsveç", a: "Tunus", rat: { s: "2-1", ht: "1-0", r: "1", t: "NORM", reason: "İsveç, Tunus'un yapısal düşük savunma bloğunu kırmak için hassas orta teslim matrisleri uyguluyor." }, sur: { s: "0-0", ht: "0-0", r: "X", t: "ANOM", reason: "Tunus kusursuz bir şekilde izole edilmiş bir çevre hattı kuruyor. İsveç, hatları baypas edecek yaratıcı varyasyondan yoksun." } },
+            { id: 13, g: "G", d: "15.06", h: "İran", a: "Yeni Zelanda", rat: { s: "1-0", ht: "0-0", r: "1", t: "NORM", reason: "İran merkezi bölge daralma noktalarını temiz bir şekilde kontrol ediyor. Bireysel klinik avantajlar düşük skorlu bir maçı neticelendiriyor." }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM", reason: "Yeni Zelanda derin kanalları kilitliyor ve doğrudan uzun-diyagonal dağıtımlarla havadan bir beraberlik golü buluyor." } },
+            { id: 14, g: "G", d: "15.06", h: "Belçika", a: "Mısır", rat: { s: "2-1", ht: "1-1", r: "1", t: "NORM", reason: "Belçika yarım alan dinamik sürücülerinden sonuç alıyor. Yüksek teknik uygulama Mısır'ın tutma hattını baypas ediyor." }, sur: { s: "1-2", ht: "0-1", r: "2", t: "ANOM", reason: "Mısır, üst düzey kanat oyuncusu takip metrikleriyle kontra atak sekanslarında izole edilmiş bekleri tek yakalıyor." } },
+            { id: 15, g: "H", d: "15.06", h: "İspanya", a: "Yeşil Burun Ad.", rat: { s: "3-0", ht: "1-0", r: "1", t: "NORM", reason: "İspanya, %75+ topa sahip olma kalıplarıyla maksimum boğma sağlıyor. Toplam alansal grid dominasyonu." }, sur: { s: "1-1", ht: "0-0", r: "X", t: "ANOM", reason: "İspanya bitiricilik metriği açıklarıyla karşılaşıyor. Yeşil Burun Adaları ultra disiplinli bir savunma yapısı uyguluyor." } },
+            { id: 16, g: "H", d: "15.06", h: "Suudi Arabistan", a: "Uruguay", rat: { s: "0-2", ht: "0-1", r: "2", t: "NORM", reason: "Uruguay agresif savunma ikili mücadele çöküşlerini zorluyor. Doğrudan ilerleme Suudi arka hatlarını aşırı yüklüyor." }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM", reason: "Suudi Arabistan derin oturarak geçiş alanlarını sınırlıyor ve hassas bir serbest vuruş takip düğümünü vuruyor." } },
+            { id: 17, g: "I", d: "16.06", h: "Fransa", a: "Senegal", rat: { s: "2-0", ht: "1-0", r: "1", t: "NORM", reason: "Fransa üst düzey derin taktik katman işleme yeteneği sergiliyor. Kanat genişliği Senegal'in yapısal ünitesini kırıyor." }, sur: { s: "1-1", ht: "0-1", r: "X", t: "ANOM", reason: "Senegal fiziksel ikili mücadele sınırlama hatlarını koruyor, anomali bir sonuç elde etmek için dinamik olarak ileri fırlıyor." } },
+            { id: 18, g: "I", d: "16.06", h: "Irak", a: "Norveç", rat: { s: "0-3", ht: "0-2", r: "2", t: "NORM", reason: "Norveç'in seçkin odak noktalı forveti, derin tehlike bölgelerinde Irak'ın merkezi metriklerini sorunsuz bir şekilde aşırı yüklüyor." }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM", reason: "Irak erken bir kontra atak setiyle ilk golü buluyor. Norveç, geç golleri zorlamak için işleme parametrelerini genişletmek zorunda kalıyor." } },
+            { id: 19, g: "J", d: "16.06", h: "Arjantin", a: "Cezayir", rat: { s: "3-1", ht: "2-0", r: "1", t: "NORM", reason: "Arjantin, gelişmiş yarım alanlarda kısa pas kombinasyonları işleterek merkezi işaretçileri kolayca açıyor." }, sur: { s: "2-2", ht: "1-1", r: "X", t: "ANOM", reason: "Cezayir sert yapısal baskı mekanizmalarıyla karşılık veriyor ve alışılmadık top kaybı anomalilerini zorluyor." } },
+            { id: 20, g: "J", d: "16.06", h: "Avusturya", a: "Ürdün", rat: { s: "2-0", ht: "1-0", r: "1", t: "NORM", reason: "Avusturya, Ürdün'ü ani dağıtım hatlarından mahrum bırakmak için yüksek hızlı şok pres şemaları kullanıyor." }, sur: { s: "1-1", ht: "0-0", r: "X", t: "ANOM", reason: "Ürdün 5-4-1 çevre konfigürasyonuna çekilerek mutlak baskı eşiklerini verimli bir şekilde emiyor." } },
+            { id: 21, g: "K", d: "17.06", h: "Portekiz", a: "Kongo DC", rat: { s: "3-1", ht: "1-1", r: "1", t: "NORM", reason: "Portekiz, geç savunma dizilimlerini çaba harcamadan parçalayan yoğun bir üçüncü bölge konfigürasyon derinliği sergiliyor." }, sur: { s: "2-2", ht: "1-2", r: "X", t: "ANOM", reason: "Kongo, merkezi alanları kilitlemeden önce ultra hızlı sezgisel kontra ataklarla arka hat yapılarını şoke ediyor." } },
+            { id: 22, g: "K", d: "17.06", h: "Özbekistan", a: "Kolombiya", rat: { s: "0-2", ht: "0-1", r: "2", t: "NORM", reason: "Kolombiya yoğun kreatif akışkan hareketler uygulayarak savunma yapılarını dengeden çıkarıyor." }, sur: { s: "1-1", ht: "1-0", r: "X", t: "ANOM", reason: "Özbekistan, savunma amaçlı bir bölünme noktası çıkarmak için kusursuz disiplinli yakın temas koruma hatlarını koruyor." } },
+            { id: 23, g: "L", d: "17.06", h: "Gana", a: "Panama", rat: { s: "2-1", ht: "1-0", r: "1", t: "NORM", reason: "Gana, hatları ayırmak için fiziksel geçiş eksenlerinde elit tempo yüklemeleri uyguluyor." }, sur: { s: "1-2", ht: "0-1", r: "2", t: "ANOM", reason: "Panama, denge endekslerini tamamen devirmek için düşük hacimli klinik duran top dönüşümlerini kullanıyor." } },
+            { id: 24, g: "L", d: "17.06", h: "İngiltere", a: "Hırvatistan", rat: { s: "1-1", ht: "0-0", r: "X", t: "NORM", reason: "Seçkin sistem sınırlama değişkenleri birbirini sıfırlıyor. Merkezi üçte birde son derece yapılandırılmış pozisyonel savaş." }, sur: { s: "1-2", ht: "1-0", r: "2", t: "ANOM", reason: "Hırvatistan orta saha tutma sekanslarını tamamen ele geçirerek oyunun sonlarında İngiliz takımı enerji matrislerini tüketiyor." } }
         ];
+
+        let activeSurpriseList = [];
 
         function renderMatrix(surpriseIds = []) {
             const tbody = document.getElementById("matrix-rows");
             tbody.innerHTML = "";
+            activeSurpriseList = surpriseIds; // Tıklama senaryosu kontrolü için referans tutulur
 
             dataset.forEach(node => {
                 const isSurprise = surpriseIds.includes(node.id);
@@ -111,7 +202,11 @@
 
                 const row = document.createElement("tr");
                 row.id = `node-${node.id}`;
-                row.className = `transition-all duration-300 hover:bg-slate-800/40 border-b border-slate-900 ${isSurprise ? 'bg-amber-500/[0.02] text-amber-400 border-l border-l-amber-500 surprise-flash' : 'text-slate-300'}`;
+
+                row.className = `transition-all duration-300 hover:bg-slate-800/60 border-b border-slate-900 cursor-pointer select-none ${isSurprise ? 'bg-amber-500/[0.02] text-amber-400 border-l border-l-amber-500 surprise-flash' : 'text-slate-300'}`;
+
+                // Taktik Gerekçelendirme için Satır Tıklama Dinamiği
+                row.onclick = () => openReasoningModal(node.id);
 
                 let resBadge = "border-slate-800 text-slate-400";
                 if(data.r === "1") resBadge = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
@@ -143,6 +238,66 @@
             });
         }
 
+        // --- İNTERAKTİF STRATEJİK GEREKÇELENDİRME PANEL MANTIĞI ---
+        function openReasoningModal(id) {
+            const matchNode = dataset.find(m => m.id === id);
+            if (!matchNode) return;
+
+            const isSurpriseActive = activeSurpriseList.includes(id);
+            const specificData = isSurpriseActive ? matchNode.sur : matchNode.rat;
+
+            // DOM Elemanları Seçimi
+            const modal = document.getElementById("reasoning-modal");
+            const badge = document.getElementById("modal-badge");
+            const heading = document.getElementById("modal-heading");
+            const teams = document.getElementById("modal-teams");
+            const ht = document.getElementById("modal-ht");
+            const score = document.getElementById("modal-score");
+            const res = document.getElementById("modal-res");
+            const text = document.getElementById("modal-text");
+
+            // Panel İçi Veri Enjeksiyonu
+            teams.innerText = `${matchNode.h} vs ${matchNode.a}`;
+            ht.innerText = specificData.ht;
+            score.innerText = specificData.s;
+            res.innerText = specificData.r;
+            text.innerText = specificData.reason;
+
+            // Analiz Moduna Göre Tematik Renk Ayarı (Rasyonel/Anomali)
+            if(isSurpriseActive) {
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                badge.innerText = "MOD: ANOMALİ_ANALİZİ";
+                score.className = "text-amber-400 font-bold font-mono text-sm";
+                modal.firstElementChild.className = modal.firstElementChild.className.replace("border-emerald-500/50", "border-amber-500/50").replace("glow-green", "glow-amber");
+            } else {
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerText = "MOD: RASYONEL_ANALİZ";
+                score.className = "text-emerald-400 font-bold font-mono text-sm";
+                modal.firstElementChild.className = modal.firstElementChild.className.replace("border-amber-500/50", "border-emerald-500/50").replace("glow-amber", "glow-green");
+            }
+
+            // Görünürlük Sınıflarını Tetikle
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                modal.firstElementChild.classList.remove("scale-95");
+            }, 20);
+        }
+
+        function closeReasoningModal() {
+            const modal = document.getElementById("reasoning-modal");
+            modal.classList.add("opacity-0");
+            modal.firstElementChild.classList.add("scale-95");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+        }
+
+        // Kapatma Kısayolu: Escape Tuşu paneli kapatır
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeReasoningModal();
+        });
+
         function triggerSurpriseEngine() {
             const size = dataset.length;
             const targetCount = Math.floor(size * 0.50);
@@ -152,7 +307,7 @@
 
             renderMatrix(activeSurprises);
 
-            document.getElementById("sys-mode").innerText = "MODE: HYBRID_ANOMALY_MATRIX (50%)";
+            document.getElementById("sys-mode").innerText = "MOD: HİBRİT_ANOMALİ_MATRİSİ (%50)";
             document.getElementById("sys-mode").className = "text-amber-400";
         }
 
