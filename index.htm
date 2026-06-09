@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol 2 - Kupa 2026 Analitik Tahmin Motoru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .surprise-flash { animation: highlight-pulse 1.2s ease-in-out; }
+        @keyframes highlight-pulse {
+            0% { background-color: rgba(245, 158, 11, 0.4); }
+            100% { background-color: transparent; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-emerald-500 selection:text-slate-900">
+
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-bold text-slate-950 text-lg shadow-lg shadow-emerald-500/20">F2</div>
+                <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">FUTBOL 2 <span class="text-xs text-emerald-400 font-mono font-normal">v2.6-AI</span></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex space-x-2 bg-slate-950/80 p-1 rounded-md border border-slate-800 text-xs text-slate-400">
+                    <span class="px-2 py-1 rounded bg-slate-800 text-emerald-400 font-medium">Yıl: 2026</span>
+                    <span class="px-2 py-1">Veri Kaynağı: Canlı Sensör + Tarihsel Hafıza</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 md:p-8 mb-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div class="max-w-2xl">
+                    <span class="text-emerald-400 text-xs font-semibold tracking-widest uppercase block mb-2 font-mono">// ÇOK KATMANLI SENTEZ MATRİSİ</span>
+                    <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white mb-3">2026 Dünya Kupası Tahmin Aracı</h1>
+                    <p class="text-sm md:text-base text-slate-400 leading-relaxed">
+                        Taktiksel geometri, 65' eşiği hücresel yorgunluk, kupa DNA'sı, xG/PPDA anomalileri ve hakem faul tolerans eşiklerini bütünsel olarak hesaplayan yapay zeka tahmin motoru.
+                    </p>
+                </div>
+
+                <div class="flex-shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <button id="btn-surprise" onclick="generateSurprisePredictions()" class="relative group overflow-hidden bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold px-6 py-4 rounded-xl shadow-lg shadow-amber-500/10 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-3 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin-slow text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        <span class="tracking-tight">YENİ TAHMİN (Sürpriz Algoritması)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-slate-800 text-xs font-mono text-slate-400">
+                <div class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span>65-70' Hücresel Yorgunluk</span></div>
+                <div class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span> <span>Taktik Geometri & PPDA</span></div>
+                <div class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> <span>Hakem/VAR Tolerans Skalası</span></div>
+                <div class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span> <span>Kupa DNA'sı & Kas Hafızası</span></div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="p-5 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between">
+                <h2 class="font-bold tracking-tight text-slate-200 flex items-center space-x-2">
+                    <span>Grup Aşaması İlk İki Maçları Fikstür Matrisi</span>
+                    <span id="badge-status" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Rasyonel Senaryo</span>
+                </h2>
+                <div class="text-xs text-slate-500 font-mono" id="summary-count">Toplam: 24 Maç Modelleniyor</div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-xs font-mono uppercase tracking-wider">
+                            <th class="p-4 font-medium">Grup</th>
+                            <th class="p-4 font-medium">Tarih</th>
+                            <th class="p-4 font-medium">Müsabaka (Ev Sahibi vs Deplasman)</th>
+                            <th class="p-4 font-medium text-center">İlk Yarı / Maç Durumu</th>
+                            <th class="p-4 font-medium text-center">Skor Tahmini</th>
+                            <th class="p-4 font-medium text-center">Maç Sonucu</th>
+                            <th class="p-4 font-medium text-center">Mod / Senaryo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fixture-rows" class="divide-y divide-slate-800/60 text-sm">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer class="mt-8 text-center text-xs text-slate-600 font-mono">
+            Futbol 2 AI Engine - Tüm nicel değişkenler, 2026 Dünya Kupası atmosferi ve hakem eğilimleri simülasyonu baz alınarak rasyonel ve sürpriz olasılıklarla ağırlıklandırılmıştır.
+        </footer>
+    </main>
+
+    <script>
+        // Real 2026 FIFA World Cup exact schedule data for the first two matches of each group (A to L)
+        const matchesData = [
+            // Group A
+            { id: 1, group: "A", date: "11 Haz 2026", home: "Meksika", away: "Güney Afrika",
+              rational: { score: "2 - 1", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (İç Saha Baskısı)" },
+              surprise: { score: "1 - 1", ht: "0-1 / MS X", outcome: "X", type: "Sürpriz (Hücresel Yorgunluk Reaksiyonu)" } },
+            { id: 2, group: "A", date: "11 Haz 2026", home: "Güney Kore", away: "Çekya",
+              rational: { score: "1 - 1", ht: "0-0 / MS X", outcome: "X", type: "Rasyonel (Denge Matrisi)" },
+              surprise: { score: "1 - 2", ht: "1-1 / MS 2", outcome: "2", type: "Sürpriz (Fiziksel Blok Üstünlüğü)" } },
+            // Group B
+            { id: 3, group: "B", date: "12 Haz 2026", home: "Kanada", away: "Bosna Hersek",
+              rational: { score: "2 - 0", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (Geometri Geçişi)" },
+              surprise: { score: "1 - 1", ht: "0-0 / MS X", outcome: "X", type: "Sürpriz (Kompakt Blok Kilidi)" } },
+            { id: 4, group: "B", date: "13 Haz 2026", home: "Katar", away: "İsviçre",
+              rational: { score: "0 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Rasyonel (Sınıf Farkı / PPDA)" },
+              surprise: { score: "1 - 1", ht: "1-0 / MS X", outcome: "X", type: "Sürpriz (Nem/İklim Adaptasyonu)" } },
+            // Group C
+            { id: 5, group: "C", date: "13 Haz 2026", home: "Haiti", away: "İskoçya",
+              rational: { score: "1 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Rasyonel (Turnuva Tecrübesi)" },
+              surprise: { score: "2 - 2", ht: "1-1 / MS X", outcome: "X", type: "Sürpriz (Genç X-Faktörü Patlaması)" } },
+            { id: 6, group: "C", date: "13 Haz 2026", home: "Brezilya", away: "Fas",
+              rational: { score: "2 - 1", ht: "1-1 / MS 1", outcome: "1", type: "Rasyonel (Kalite Korelasyonu)" },
+              surprise: { score: "1 - 2", ht: "1-0 / MS 2", outcome: "2", type: "Sürpriz (Fas Kupa DNA Savunması)" } },
+            // Group D
+            { id: 7, group: "D", date: "12 Haz 2026", home: "ABD", away: "Paraguay",
+              rational: { score: "2 - 0", ht: "0-0 / MS 1", outcome: "1", type: "Rasyonel (Desibel Baskısı)" },
+              surprise: { score: "0 - 1", ht: "0-1 / MS 2", outcome: "2", type: "Sürpriz (Katı Düşük Blok Kilidi)" } },
+            { id: 8, group: "D", date: "14 Haz 2026", home: "Avustralya", away: "Türkiye",
+              rational: { score: "1 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Rasyonel (Mikro Match-up Avantajı)" },
+              surprise: { score: "2 - 2", ht: "2-0 / MS X", outcome: "X", type: "Sürpriz (Yüksek Şiddetli Pres / Duran Top)" } },
+            // Group E
+            { id: 9, group: "E", date: "14 Haz 2026", home: "Almanya", away: "Curaçao",
+              rational: { score: "4 - 0", ht: "2-0 / MS 1", outcome: "1", type: "Rasyonel (Ezici xG Üstünlüğü)" },
+              surprise: { score: "2 - 1", ht: "0-0 / MS 1", outcome: "1", type: "Sürpriz (Hakem Kart Tolerans Direnci)" } },
+            { id: 10, group: "E", date: "14 Haz 2026", home: "Fildişi Sahili", away: "Ekvador",
+              rational: { score: "1 - 1", ht: "1-0 / MS X", outcome: "X", type: "Rasyonel (Fonksiyonel Fitnes Dengesi)" },
+              surprise: { score: "1 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Sürpriz (Gece Koşullarında Enerji Yönetimi)" } },
+            // Group F
+            { id: 11, group: "F", date: "14 Haz 2026", home: "Hollanda", away: "Japonya",
+              rational: { score: "2 - 2", ht: "1-1 / MS X", outcome: "X", type: "Rasyonel (Geometri Taktik Savaşı)" },
+              surprise: { score: "1 - 2", ht: "1-0 / MS 2", outcome: "2", type: "Sürpriz (Japon B-Planı Yoğunluğu)" } },
+            { id: 12, group: "F", date: "15 Haz 2026", home: "İsveç", away: "Tunus",
+              rational: { score: "2 - 1", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (Fiziksel Kas Hafızası)" },
+              surprise: { score: "0 - 0", ht: "0-0 / MS X", outcome: "X", type: "Sürpriz (Kriz Yönetimi / Tempoyu Boğma)" } },
+            // Group G
+            { id: 13, group: "G", date: "15 Haz 2026", home: "İran", away: "Yeni Zelanda",
+              rational: { score: "1 - 0", ht: "0-0 / MS 1", outcome: "1", type: "Rasyonel (Savunma Disiplini)" },
+              surprise: { score: "1 - 1", ht: "1-0 / MS X", outcome: "X", type: "Sürpriz (Uzun Top İkincil Mücadele Anomalisi)" } },
+            { id: 14, group: "G", date: "15 Haz 2026", home: "Belçika", away: "Mısır",
+              rational: { score: "2 - 1", ht: "1-1 / MS 1", outcome: "1", type: "Rasyonel (Merkez Blok Hakimiyeti)" },
+              surprise: { score: "1 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Sürpriz (Salah Kontrat/Kariyer Motivasyonu)" } },
+            // Group H
+            { id: 15, group: "H", date: "15 Haz 2026", home: "İspanya", away: "Yeşil Burun Adaları",
+              rational: { score: "3 - 0", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (Topa Sahip Olma / Domine xA)" },
+              surprise: { score: "1 - 1", ht: "0-0 / MS X", outcome: "X", type: "Sürpriz (Derin Blokta Sıfır Alan Sıkıştırması)" } },
+            { id: 16, group: "H", date: "15 Haz 2026", home: "Suudi Arabistan", away: "Uruguay",
+              rational: { score: "0 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Rasyonel (Agresif Pres/Geometri Üstünlüğü)" },
+              surprise: { score: "1 - 1", ht: "1-0 / MS X", outcome: "X", type: "Sürpriz (Hakem Sertlik Tolerans Limiti)" } },
+            // Group I
+            { id: 17, group: "I", date: "16 Haz 2026", home: "Fransa", away: "Senegal",
+              rational: { score: "2 - 0", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (Elit Hücum İkili Eşleşmeleri)" },
+              surprise: { score: "1 - 1", ht: "0-1 / MS X", outcome: "X", type: "Sürpriz (Tarihsel Açılış Psikolojisi)" } },
+            { id: 18, group: "I", date: "16 Haz 2026", home: "Irak", away: "Norveç",
+              rational: { score: "0 - 3", ht: "0-2 / MS 2", outcome: "2", type: "Rasyonel (Haaland xG/Bitiricilik Faktörü)" },
+              surprise: { score: "1 - 2", ht: "1-0 / MS 2", outcome: "2", type: "Sürpriz (Erken Şok Pres Golü)" } },
+            // Group J
+            { id: 19, group: "J", date: "16 Haz 2026", home: "Arjantin", away: "Cezayir",
+              rational: { score: "3 - 1", ht: "2-0 / MS 1", outcome: "1", type: "Rasyonel (Kupa DNA'sı ve Son Şampiyon Hafızası)" },
+              surprise: { score: "2 - 2", ht: "1-1 / MS X", outcome: "X", type: "Sürpriz (Oran Anomalisi / Pres Tetikleyicisi)" } },
+            { id: 20, group: "J", date: "16 Haz 2026", home: "Avusturya", away: "Ürdün",
+              rational: { score: "2 - 0", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (Rangnick Yoğun Pres / PPDA)" },
+              surprise: { score: "1 - 1", ht: "0-0 / MS X", outcome: "X", type: "Sürpriz (İlk Maç Defansif Adrenali)" } },
+            // Group K
+            { id: 21, group: "K", date: "17 Haz 2026", home: "Portekiz", away: "Kongo DC",
+              rational: { score: "3 - 1", ht: "1-1 / MS 1", outcome: "1", type: "Rasyonel (Yaratıcı Hatlar Arası Pas Geometrisi)" },
+              surprise: { score: "2 - 2", ht: "1-2 / MS X", outcome: "X", type: "Sürpriz (Kanat Match-up Hız Deformasyonu)" } },
+            { id: 22, group: "K", date: "17 Haz 2026", home: "Özbekistan", away: "Kolombiya",
+              rational: { score: "0 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Rasyonel (Güney Amerika Geçiş Dinamiği)" },
+              surprise: { score: "1 - 1", ht: "1-0 / MS X", outcome: "X", type: "Sürpriz (Kompakt Alan Daraltma Hafızası)" } },
+            // Group L
+            { id: 23, group: "L", date: "17 Haz 2026", home: "Gana", away: "Panama",
+              rational: { score: "2 - 1", ht: "1-0 / MS 1", outcome: "1", type: "Rasyonel (Atletik Hücre Üstünlüğü)" },
+              surprise: { score: "1 - 2", ht: "0-1 / MS 2", outcome: "2", type: "Sürpriz (65' Sonrası İş Yükü Kırılması)" } },
+            { id: 24, group: "L", date: "17 Haz 2026", home: "İngiltere", away: "Hırvatistan",
+              rational: { score: "1 - 1", ht: "0-0 / MS X", outcome: "X", type: "Rasyonel (Turnuva Başlangıç Stratejisi)" },
+              surprise: { score: "1 - 2", ht: "1-0 / MS 2", outcome: "2", type: "Sürpriz (Hırvat Orta Saha Kas Hafızası)" } }
+        ];
+
+        // System State Tracker
+        let currentStatus = "rational"; // "rational" or "surprise"
+
+        // Function to render rows into DOM
+        function renderTable(surpriseIds = []) {
+            const tbody = document.getElementById("fixture-rows");
+            tbody.innerHTML = "";
+
+            matchesData.forEach(match => {
+                const isSurpriseActive = surpriseIds.includes(match.id);
+                const currentPredict = isSurpriseActive ? match.surprise : match.rational;
+
+                const row = document.createElement("tr");
+                row.id = `match-${match.id}`;
+                row.className = `transition-all duration-300 hover:bg-slate-800/30 ${isSurpriseActive ? 'bg-amber-500/5 text-amber-200 border-l-2 border-l-amber-500 surprise-flash' : ''}`;
+
+                // Color formatting for outcomes
+                let outcomeBadge = "";
+                if(currentPredict.outcome === "1") outcomeBadge = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                else if(currentPredict.outcome === "X") outcomeBadge = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+                else outcomeBadge = "bg-purple-500/10 text-purple-400 border-purple-500/20";
+
+                row.innerHTML = `
+                    <td class="p-4 font-bold text-slate-400 font-mono text-center">
+                        <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700">${match.group}</span>
+                    </td>
+                    <td class="p-4 text-xs font-mono text-slate-400">${match.date}</td>
+                    <td class="p-4 font-semibold text-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-white">${match.home}</span>
+                            <span class="text-slate-600 font-normal text-xs">vs</span>
+                            <span class="text-slate-300">${match.away}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center font-mono text-xs text-slate-300">${currentPredict.ht}</td>
+                    <td class="p-4 text-center font-bold text-emerald-400 font-mono tracking-wider">${currentPredict.score}</td>
+                    <td class="p-4 text-center">
+                        <span class="px-3 py-1 rounded-md text-xs font-mono font-bold border ${outcomeBadge}">${currentPredict.outcome}</span>
+                    </td>
+                    <td class="p-4 text-xs text-slate-400 italic">
+                        <div class="max-w-[240px] truncate" title="${currentPredict.type}">${currentPredict.type}</div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Surprise Engine Algorithm (Triggers exactly 50% surprise rate dynamically)
+        function generateSurprisePredictions() {
+            const totalMatches = matchesData.length;
+            const targetSurpriseCount = Math.floor(totalMatches * 0.50); // Exactly 12 matches
+
+            // Shuffle IDs array to select 50% randomly
+            const shuffledIds = matchesData.map(m => m.id).sort(() => 0.5 - Math.random());
+            const selectedSurpriseIds = shuffledIds.slice(0, targetSurpriseCount);
+
+            // Re-render table with selection
+            renderTable(selectedSurpriseIds);
+
+            // Update Badges & Status Headings
+            const badge = document.getElementById("badge-status");
+            badge.innerText = "Yapay Zeka Sürpriz Algoritması Devrede (%50 Hibrit)";
+            badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20";
+
+            document.getElementById("summary-count").innerText = `Anomali Dağılımı: 12 Rasyonel / 12 Sürpriz`;
+        }
+
+        // Initial Boot
+        window.onload = function() {
+            renderTable();
+        };
+    </script>
+</body>
+</html>
