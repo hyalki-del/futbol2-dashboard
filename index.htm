@@ -1,126 +1,567 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F2 // 2026 DÜNYA KUPASI TAHMİN ROBOTU - 9 KATMANLI MATRİS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght=300;400;600;800&family=JetBrains+Mono:wght=400;700&display=swap');
 
-<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>World Cup 2026 AI Analyst v3</title>
-<style>
-body{margin:0;background:#0a0f1c;color:#fff;font-family:Arial}
-header{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,#200,#b00,#200);padding:15px;text-align:center}
-.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-button{padding:12px 18px;border:0;border-radius:12px;cursor:pointer}
-.primary{background:#d00;color:#fff}.secondary{background:#333;color:#fff}
-#bar{position:sticky;top:90px;background:#111;padding:10px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:15px;padding:20px}
-.card,.pred{background:#151c2d;border-radius:16px;padding:15px;cursor:pointer;transition:.3s}
-.card:hover,.pred:hover{transform:translateY(-5px)}
-.sel{outline:2px solid gold}
-.hidden{display:none}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center}
-.box{width:min(850px,92%);max-height:85vh;overflow:auto;background:#111;padding:22px;border-radius:18px}
-.fade{animation:f .4s}@keyframes f{from{opacity:0;transform:translateY(15px)}to{opacity:1}}
-</style></head><body>
-<header>
-<h1>🏆 World Cup 2026 AI Analyst</h1>
-<div class="controls">
-<button class="primary" onclick="showPredictions()">Tahminleri Göster</button>
-<button class="secondary" onclick="newPredictions()">Yeni Rastgele Tahminler</button>
-<button class="secondary" onclick="location.reload()">Sıfırla</button>
-</div></header>
-<div id="bar"><b>Seçilen Maçlar:</b> <span id="chosen">Yok</span></div>
-<div id="home"><div class="cards" id="cards"></div></div>
-<div id="predictions" class="hidden"></div>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #05070c;
+            position: relative;
+        }
 
-<div id="modal" class="modal" onclick="closeModal()">
-<div class="box fade" onclick="event.stopPropagation()">
-<h2>AI Analiz Raporu</h2>
-<div id="detail"></div><br>
-<button class="primary" onclick="closeModal()">Kapat</button>
-</div></div>
+        .mono-text { font-family: 'JetBrains Mono', monospace; }
 
-<script>
-const matches=[
-["Brezilya","Fas"],["Türkiye","Avustralya"],["İngiltere","Hırvatistan"],
-["Almanya","Curaçao"],["Fransa","Senegal"],["Arjantin","Cezayir"]
-];
-let selected=[],stored=[];
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            z-index: -10;
+            pointer-events: none;
+            filter: contrast(125%) brightness(75%);
+        }
 
-matches.forEach((m,i)=>{
- let d=document.createElement("div");
- d.className="card";
- d.innerHTML=`<h3>${m[0]}</h3><p>vs</p><h3>${m[1]}</h3>`;
- d.onclick=()=>{
-  d.classList.toggle("sel");
-  selected.includes(i)?selected=selected.filter(x=>x!==i):selected.push(i);
-  chosen.textContent=selected.length?selected.map(x=>matches[x].join(" - ")).join(" | "):"Yok";
- };
- cards.appendChild(d);
-});
+        .hud-glow-cyan { box-shadow: 0 0 25px rgba(34, 211, 238, 0.15); border-color: rgba(34, 211, 238, 0.3); }
+        .hud-glow-amber { box-shadow: 0 0 25px rgba(245, 158, 11, 0.25); border-color: rgba(245, 158, 11, 0.4); }
+        .hud-glow-rose { box-shadow: 0 0 25px rgba(244, 63, 94, 0.3); border-color: rgba(244, 63, 94, 0.5); }
 
-const starters=[
-"Orta saha kontrolünün maçın ilk bölümünde belirleyici olacağı varsayıldı.",
-"Simülasyonlarda pres yoğunluğu erken bölümde önemli fark yarattı.",
-"Topa sahip olma üstünlüğünün oyunun ritmini şekillendirmesi bekleniyor.",
-"Geçiş hücumları modelde kritik üretim kaynağı olarak öne çıktı."
-];
+        @keyframes flyUp {
+            0% { transform: translateY(40px) scale(1.05); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .animate-fly-up { animation: flyUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .surprise-flash { animation: flash 1.5s infinite alternate; }
+        @keyframes flash {
+            0% { box-shadow: 0 0 10px currentColor; }
+            100% { box-shadow: 0 0 30px currentColor; }
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen p-4 md:p-8">
 
-function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+    <div class="max-w-6xl mx-auto space-y-6">
 
-function generate(m){
- let iyh=Math.floor(Math.random()*3), iya=Math.floor(Math.random()*3);
- let syh=Math.floor(Math.random()*3), sya=Math.floor(Math.random()*3);
- let home=iyh+syh, away=iya+sya;
- let ms=home>away?"1":home<away?"2":"X";
+        <div class="border border-slate-800/80 bg-slate-950/70 backdrop-blur-xl p-6 rounded-2xl flex flex-col space-y-4 hud-glow-cyan" id="main-header">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800/50 pb-4">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-3">
+                        <div class="h-2 w-2 rounded-full bg-cyan-400 animate-ping"></div>
+                        <h1 class="text-xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">2026 DÜNYA KUPASI TAHMİN ROBOTU</h1>
+                    </div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mono-text flex items-center space-x-4">
+                        <span>SİSTEM AKTİF</span>
+                        <span>|</span>
+                        <span id="sys-mode" class="text-cyan-400">MAÇ SEÇİM AŞAMASI</span>
+                    </div>
+                </div>
 
- let firstHalf=`${rnd(starters)} İlk yarı senaryolarının önemli bölümünde ${m[0]} ile ${m[1]} arasındaki mücadelede merkez bölgelerde yoğun temas görüldü. Erken bir gol ihtimali oyunun dengesini değiştirebilecek temel unsur olarak değerlendirildi.`;
+                <div class="flex flex-wrap gap-3">
+                    <button id="btn-confirm" onclick="confirmMatches()" class="bg-cyan-500 text-black font-black tracking-widest text-[11px] px-6 py-3.5 rounded-xl transition-all duration-300 hover:bg-cyan-400 hover:scale-105 active:scale-95 cursor-pointer shadow-lg shadow-cyan-500/20 uppercase">
+                        [ 1. SEÇİMLERİ ONAYLA ]
+                    </button>
 
- let secondHalf=`İkinci yarı modelinde 60. dakikadan sonra oyuncu enerjisinin ve kulübe katkısının etkisi artırıldı. Bu nedenle son bölümde oyunun daha açık hale gelmesi ve savunma hatalarının gol olasılığını yükseltmesi bekleniyor.`;
+                    <button id="btn-generate" onclick="generateHybridPredictions()" disabled class="hidden opacity-20 bg-transparent border-2 border-cyan-500/50 text-cyan-400 font-extrabold tracking-widest text-[11px] px-6 py-3.5 rounded-xl transition-all duration-300 uppercase items-center space-x-1 hover:bg-cyan-500 hover:text-black">
+                        <span>[ 2. TAHMİN YÜRÜT ]</span>
+                    </button>
+                </div>
+            </div>
 
- let matchResult=`Maç sonucu tahmini oluşturulurken skor üretimi, oyun kontrolü ve psikolojik momentum birlikte değerlendirildi. Simülasyonların çoğunda ortaya çıkan ortak eğilim '${ms}' sonucunu destekledi, ancak tek bir kritik pozisyon tüm senaryoyu değiştirebilir.`;
+            <div id="system-guideline" class="text-xs font-medium tracking-wide text-slate-400 bg-slate-900/40 p-3 rounded-xl border border-slate-800/40 text-center">
+                🔮 <span class="text-cyan-400 font-bold">SİSTEM MESAJI:</span> Alttaki havuzdan analiz etmek istediğiniz maçların <span class="text-white font-bold">kartlarına tıklayarak</span> seçiminizi yapın.
+            </div>
+        </div>
 
- let risk=`Risk faktörleri arasında duran toplar, bireysel savunma hataları, hakem kararları ve erken kartlar bulunuyor. Özellikle ilk golü atan tarafın oyunu yönetme ihtimali belirgin şekilde yükseliyor.`;
+        <div id="selected-deck-container" class="space-y-2">
+            <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mono-text px-1">SEÇİLEN AKTİF MAÇLAR</div>
+            <div id="selected-deck" class="border-2 border-dashed border-slate-800 bg-slate-950/20 rounded-2xl p-4 min-h-[110px] flex flex-wrap gap-3 items-center justify-center transition-all duration-300">
+                <div id="deck-placeholder" class="text-xs text-slate-600 uppercase tracking-widest mono-text font-semibold">[ LÜTFEN BİR MAÇ SEÇİN ]</div>
+            </div>
+        </div>
 
- let confidence=Math.floor(55+Math.random()*35);
+        <div id="pool-container" class="space-y-2">
+            <div id="pool-title" class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mono-text px-1">MEVCUT TURNUVA MAÇLARI</div>
+            <div id="available-pool" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
 
- return {
-  iy:`${iyh}-${iya}`,
-  sy:`${syh}-${sya}`,
-  ms,
-  confidence,
-  fav:Math.random()>.5?"⭐ Favori":"🔥 Sürpriz",
-  report:`
-  <h3>İlk Yarı Analizi</h3><p>${firstHalf}</p>
-  <h3>İkinci Yarı Analizi</h3><p>${secondHalf}</p>
-  <h3>Maç Sonucu Analizi</h3><p>${matchResult}</p>
-  <h3>Risk Değerlendirmesi</h3><p>${risk}</p>
-  <h3>AI Güven Seviyesi</h3><p>%${confidence}</p>`
- };
-}
+        <div class="flex justify-between items-center text-[10px] text-slate-600 tracking-widest px-2 mono-text font-bold mt-8">
+            <span>DÜŞÜNME MODU: FUTBOL 2 A.I. PRO</span>
+            <span>WC26 - 9 KATMANLI MATRİS</span>
+        </div>
+    </div>
 
-function render(){
- predictions.innerHTML="<h2 style='padding:20px'>Tahminler (Detay için tıkla)</h2>";
- stored.forEach((p,i)=>{
-  let d=document.createElement("div");
-  d.className="pred fade";
-  d.innerHTML=`<h3>${matches[selected[i]][0]} vs ${matches[selected[i]][1]}</h3>
-  <p>${p.fav}</p>
-  <p><b>İlk Yarı:</b> ${p.iy}</p>
-  <p><b>İkinci Yarı:</b> ${p.sy}</p>
-  <p><b>Maç Sonucu:</b> ${p.ms}</p>
-  <p><b>Güven:</b> %${p.confidence}</p>`;
-  d.onclick=()=>{detail.innerHTML=p.report;modal.style.display='flex';};
-  predictions.appendChild(d);
- });
-}
-function showPredictions(){
- if(!selected.length){alert("Maç seçiniz");return;}
- home.classList.add("hidden");
- predictions.classList.remove("hidden");
- stored=selected.map(i=>generate(matches[i]));
- render();
-}
-function newPredictions(){
- if(!selected.length)return;
- stored=selected.map(i=>generate(matches[i]));
- if(!predictions.classList.contains("hidden")) render();
-}
-function closeModal(){modal.style.display='none';}
-</script></body></html>
+    <div id="reasoning-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-lg z-50 hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0" onclick="closeReasoningModal()">
+        <div class="bg-slate-900 border border-slate-800 max-w-2xl w-full rounded-2xl p-6 shadow-2xl space-y-4 text-xs text-slate-300 transform scale-95 transition-all duration-300" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span id="modal-badge" class="px-2 py-0.5 rounded text-[10px] font-bold mono-text">ANALİZ</span>
+                    <h3 id="modal-heading" class="text-white font-extrabold tracking-wider uppercase text-sm">YAPAY ZEKA MATRİS RAPORU</h3>
+                </div>
+                <button onclick="closeReasoningModal()" class="text-slate-500 hover:text-white transition-colors tracking-widest font-bold text-[10px] mono-text">&times; KAPAT</button>
+            </div>
+            <div>
+                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text mb-1">SEÇİLEN EŞLEŞME</p>
+                <div id="modal-teams" class="text-lg font-extrabold text-white tracking-wide">Home vs Away</div>
+            </div>
+            <div>
+                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text mb-1">SİMÜLE EDİLEN SKOR</p>
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex justify-between items-center text-center">
+                    <div>
+                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">İLK YARI</span>
+                        <span id="modal-ht" class="text-slate-300 font-bold mono-text text-sm">0-0</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">MAÇ SONU</span>
+                        <span id="modal-score" class="font-bold mono-text text-xl">0-0</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">SONUÇ</span>
+                        <span id="modal-res" class="text-slate-300 font-bold mono-text text-sm">X</span>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text">9 KATMANLI SENTEZ GEREKÇESİ</p>
+                <div id="modal-text" class="text-slate-300 leading-relaxed bg-slate-950/50 p-4 border border-slate-800/50 rounded-xl max-h-64 overflow-y-auto"></div>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeReasoningModal()" class="w-full bg-slate-800 text-white font-black py-2.5 rounded-xl transition-all duration-200 uppercase tracking-wider text-[11px] hover:bg-slate-700">
+                    MATRİSİ KAPAT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dataset = [
+            {
+                id: 1, g: "A", d: "11.06", h: "Meksika", hf: "🇲🇽", a: "Güney Afrika", af: "🇿🇦",
+                muhtemel: { prob: 60, s: "2-0", ht: "1-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Javier Aguirre'nin pragmatik 4-3-3 geometrisi rakip kanatları izole eder. <br><b>SAĞLIK:</b> Yüksek rakım adaptasyonu Meksika'nın laktik eşiğini 80. dakikaya kadar korur. <br><b>SOYUNMA ODASI:</b> Aguirre'nin baba figürü kriz yönetimini kolaylaştırır. <br><b>X-FAKTÖR:</b> Santi Gimenez ceza sahasındaki mikro 1'e 1'leri domine eder. <br><b>VERİ:</b> Düşük PPDA ve duran toplardan yüksek xG. <br><b>DNA:</b> Ev sahibinin turnuva açılış refleksi. <br><b>HAKEM:</b> Ev sahibi desibel baskısı gri pozisyonları Meksika lehine çevirir. <br><b>TARİHSEL:</b> Ev sahipleri açılış maçlarını %80 kazanır. <br><b>ATMOSFER:</b> Estadio Azteca'daki 80.000 kişilik muazzam psikolojik baskı." },
+                surpriz: { prob: 25, s: "0-0", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Güney Afrika'nın derin bloğu Aguirre'nin oyun genişliğini tamamen nötralize eder. <br><b>SAĞLIK:</b> Her iki takım da açılış maçı anksiyetesiyle beklenenden erken fiziksel çöküş yaşar. <br><b>VERİ:</b> PPDA değerleri fırlar, 3. bölgede xA (beklenen asist) sıfıra iner. <br><b>HAKEM:</b> Katı bir hakem yönetimi oyun ritmini keserek ev sahibi ivmesini durdurur." },
+                kaos: { prob: 15, s: "1-2", ht: "1-0", r: "2", t: "KAOS", reason: "<b>X-FAKTÖR:</b> Güney Afrika'nın genç ve patlayıcı kanatları 75'ten sonra yorulan Meksika beklerini cezalandırır. <br><b>ATMOSFER:</b> Kaçan bir penaltı sonrası Azteca baskısı toksikleşir ve ev sahibinde mental çöküş yaratır." }
+            },
+            {
+                id: 2, g: "A", d: "11.06", h: "Güney Kore", hf: "🇰🇷", a: "Çekya", af: "🇨🇿",
+                muhtemel: { prob: 50, s: "1-2", ht: "0-1", r: "2", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Çekya'nın fiziksel 3-5-2'si Kore'nin orta saha geçişlerini ezer. <br><b>SAĞLIK:</b> Yüksek eforlu pres, Kore takımını 65. dakikada fonksiyonel yorgunluğa sokar. <br><b>SOYUNMA ODASI:</b> Çeklerin turnuva grup aşamalarındaki kas hafızası devreye girer. <br><b>X-FAKTÖR:</b> Son Heung-min'e uygulanan sıkı markaj xA üretimini bitirir. <br><b>VERİ:</b> Çekya hava toplarını ve duran top xG'sini domine eder. <br><b>DNA:</b> Avrupa yapısal disiplini. <br><b>HAKEM:</b> İkili mücadelelere izin veren Avrupa standardı hakem Çekya'ya yarar. <br><b>TARİHSEL:</b> UEFA takımlarının denk eşleşmelerde AFC'ye karşı %65 üstünlüğü var." },
+                surpriz: { prob: 30, s: "1-1", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Kore B planı olarak 5-4-1'e döner, merkezi kapatarak Çekleri kilitler. <br><b>SAĞLIK:</b> Her iki hoca da yük yönetimini (workload) korumak için sprint mesafelerini düşürür. <br><b>VERİ:</b> Maç toplam 1.2 xG altında kısır bir döngüde biter." },
+                kaos: { prob: 20, s: "2-0", ht: "1-0", r: "1", t: "KAOS", reason: "<b>HAKEM:</b> Çekya stoperinin ağır çekimde tespit edilen erken bir kırmızı kartı taktiksel geometriyi yırtar. <br><b>X-FAKTÖR:</b> Koreli genç yetenekler eksik rakibe karşı hızlı kombinasyonlarla fişi çeker." }
+            },
+            {
+                id: 3, g: "B", d: "12.06", h: "Kanada", hf: "🇨🇦", a: "Bosna Hersek", af: "🇧🇦",
+                muhtemel: { prob: 55, s: "2-0", ht: "1-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Kanada'nın dinamik kanat bekleri Bosna'nın katı 4-4-2'sini esnetir. <br><b>SAĞLIK:</b> Kanada'nın elit 21 günlük yük yönetimi onları 85. dakikaya kadar diri tutar. <br><b>SOYUNMA ODASI:</b> Ev sahibi motivasyonu oyuncularda maksimum prim/sözleşme hırsı yaratır. <br><b>X-FAKTÖR:</b> Alphonso Davies kanatta muazzam 1'e 1 üstünlükler kurar. <br><b>VERİ:</b> Kanada'nın geçiş hücumu xG'si yavaş dönen savunmaları cezalandırır. <br><b>ATMOSFER:</b> Coşkulu Kanada taraftarı sürekli bir momentum sağlar." },
+                surpriz: { prob: 30, s: "0-0", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Bosna otobüsü çeker; derin ve dar blok Kanada'nın hızını tamamen emer. <br><b>SOYUNMA ODASI:</b> Bosna'nın kriz yönetimi risk almamak üzerine kuruludur. <br><b>VERİ:</b> Kanada %70 topla oynar ancak anlamlı hiçbir xA (beklenen asist) üretemez." },
+                kaos: { prob: 15, s: "0-1", ht: "0-0", r: "2", t: "KAOS", reason: "<b>X-FAKTÖR:</b> Bosna 90. dakikada bulduğu tek bir duran topla maçı çalar. <br><b>DNA:</b> Kanada'nın Dünya Kupası arenasında bitiricilik ve tecrübe eksikliği tamamen baskın oyuna rağmen onları hüsrana uğratır." }
+            },
+            {
+                id: 4, g: "B", d: "13.06", h: "Katar", hf: "🇶🇦", a: "İsviçre", af: "🇨🇭",
+                muhtemel: { prob: 65, s: "0-2", ht: "0-1", r: "2", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Murat Yakın'ın yapısal geometrisi Katar'ın oyun kurmasını tamamen yutar. <br><b>SAĞLIK:</b> İsviçre spor hekimliği iklime kusursuz adapte olmuştur, laktik düşüş engellenir. <br><b>SOYUNMA ODASI:</b> İsviçreli tecrübeli oyuncular üst düzey taktiksel kas hafızası sergiler. <br><b>VERİ:</b> İsviçre'nin PPDA (ön alan baskısı) verimliliği kusursuz çalışır. <br><b>DNA:</b> İsviçre'nin gruptan çıkma ve Son 16 pedigree'si. <br><b>TARİHSEL:</b> UEFA 2. torba takımları AFC'yi tarihsel olarak ezer geçer." },
+                surpriz: { prob: 25, s: "1-1", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>SAĞLIK:</b> Şiddetli nem İsviçre'yi düşük enerji (rölanti) moduna girmeye zorlar. <br><b>TAKTİK:</b> Katar'ın yan paslara dayalı B planı oyunun ritmini tamamen öldürür ve maçı kilitler." },
+                kaos: { prob: 10, s: "1-0", ht: "0-0", r: "1", t: "KAOS", reason: "<b>HAKEM:</b> Ev sahibi kıta avantajı taşıyan tartışmalı bir VAR kararı Katar'a penaltı hediye eder. <br><b>SOYUNMA ODASI:</b> İsviçre sinirlerine hakim olamaz, kırmızı kartla dağılır." }
+            },
+            {
+                id: 5, g: "C", d: "13.06", h: "Haiti", hf: "🇭🇹", a: "İskoçya", af: "🏴",
+                muhtemel: { prob: 55, s: "0-1", ht: "0-0", r: "2", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> İskoçya'nın sert 5-4-1 orta bloğu alanları daraltır. <br><b>SAĞLIK:</b> İskoç fiziği Haiti'nin hızını 75. dakika eşiğine kadar tolere eder. <br><b>X-FAKTÖR:</b> McTominay'in ceza sahasına geç koşuları kilidi açar. <br><b>VERİ:</b> İskoçya açık oyunda xG üretemez ama duran topları yüksek yüzdeyle gole çevirir. <br><b>DNA:</b> Dünya Kupası grubundan nihayet çıkma çaresizliği ve hırsı. <br><b>HAKEM:</b> Ada futboluna yatkın hakem sert müdahalelere düdük çalmaz." },
+                surpriz: { prob: 30, s: "0-0", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> İki takım da birbirini kilitler; Haiti'nin hızı İskoçya'nın geride kurduğu hatta çarpar. <br><b>VERİ:</b> Sıfır net gol pozisyonu (big chance); PPDA düşük ama tamamen etkisizdir." },
+                kaos: { prob: 15, s: "2-1", ht: "1-0", r: "1", t: "KAOS", reason: "<b>X-FAKTÖR:</b> Haitili kanatlar sadece patlayıcı hızlarını kullanarak İskoç bloğunu geçiş oyununda iki kez deler. <br><b>SAĞLIK:</b> İskoçya yüksek nemde ani bir metabolik çöküş (hücresel yorgunluk) yaşar." }
+            },
+            {
+                id: 6, g: "C", d: "13.06", h: "Brezilya", hf: "🇧🇷", a: "Fas", af: "🇲🇦",
+                muhtemel: { prob: 50, s: "2-1", ht: "1-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Ancelotti'nin akışkan 4-3-3'ü Regragui'nin katı 4-1-4-1 savunma ağını esnetir. <br><b>SAĞLIK:</b> Yaşlanan Casemiro 65'te laktik duvara çarpar ama yedek kulübesi derinliği bunu kapatır. <br><b>SOYUNMA ODASI:</b> Ancelotti'nin benzersiz insan yönetimi Brezilya anksiyetesini siler. <br><b>X-FAKTÖR:</b> Vinícius Jr., Hakimi ile olan mikro eşleşmeyi kazanır. <br><b>DNA:</b> Brezilya'nın 5 yıldızlı kupa hafızası. <br><b>HAKEM:</b> Yetenekli dribblingcileri koruyan katı bir hakem yönetimi." },
+                surpriz: { prob: 30, s: "1-1", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Amrabat ve Fas orta sahası kusursuz pres tetikleyicileri uygulayarak Brezilya'nın hücum hattı bağlantılarını keser. <br><b>VERİ:</b> Brezilya uzaktan düşük yüzdeli şutlara mahkum edilir." },
+                kaos: { prob: 20, s: "0-1", ht: "0-1", r: "2", t: "KAOS", reason: "<b>DNA:</b> Fas'ın 2022'deki dev avcısı refleksi tekrar uyanır. <br><b>X-FAKTÖR:</b> Brezilya'nın aşırı öne çıkan bekleri arkasında bırakılan boşluk şok bir kontra atakla tarihi bir hezimete yol açar." }
+            },
+            {
+                id: 7, g: "D", d: "12.06", h: "ABD", hf: "🇺🇸", a: "Paraguay", af: "🇵🇾",
+                muhtemel: { prob: 60, s: "2-1", ht: "1-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Pochettino'nun yüksek yoğunluklu pres şeması Paraguay'ın oyun kurulumunu bozar. <br><b>SAĞLIK:</b> ABD takımının 21 günlük elit workload yönetimi onları diri tutar. <br><b>SOYUNMA ODASI:</b> Pulisic'in liderliği ve gençlerin Avrupa devlerine transfer olma motivasyonu. <br><b>X-FAKTÖR:</b> Balogun'un hızı yaşlı Paraguay stoperlerini ezer. <br><b>TARİHSEL:</b> Ev sahipleri gruplarda %80 oranında başarılı olur. <br><b>ATMOSFER:</b> 70.000+ ABD taraftarı sağır edici bir desibel baskısı kurar." },
+                surpriz: { prob: 25, s: "0-0", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Paraguay'ın tarihsel kas hafızasındaki o acımasız, düşük blok savunma geleneği ABD'nin yaratıcılığını boğar. <br><b>HAKEM:</b> Fiziksel temasa çok izin veren hakem oyunun ritmini lime lime eder." },
+                kaos: { prob: 15, s: "0-2", ht: "0-1", r: "2", t: "KAOS", reason: "<b>X-FAKTÖR:</b> ABD'nin önde kurulan savunma çizgisi, tek bir Paraguaylı forvetin 1'e 1'leri kazanmasıyla çöker. <br><b>SAĞLIK:</b> Aşırı ev sahibi baskısı genç ABD takımında mental kaynaklı erken hücresel yorgunluğa yol açar." }
+            },
+            {
+                id: 8, g: "D", d: "14.06", h: "Avustralya", hf: "🇦🇺", a: "Türkiye", af: "🇹🇷",
+                muhtemel: { prob: 55, s: "0-2", ht: "0-1", r: "2", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Montella'nın 4-2-3-1 kontra-pres sistemi Avustralya'nın katı bloğunu kolayca baypas eder. <br><b>SAĞLIK:</b> Hakan Çalhanoğlu için uygulanan optimal yükleme meyvelerini verir. <br><b>SOYUNMA ODASI:</b> Euro 2024'ten gelen momentum ve yüksek özgüven. <br><b>X-FAKTÖR:</b> Arda Güler ve Kenan Yıldız yarım alanlarda mikro 1'e 1'leri parçalar. <br><b>VERİ:</b> Yüksek Türkiye xA (beklenen asist) metrikleri. <br><b>DNA:</b> Türkiye'nin turnuvalardaki kaotik ama ölümcül refleksi. <br><b>ATMOSFER:</b> Devasa Türk diasporası maçı adeta iç saha maçına çevirir." },
+                surpriz: { prob: 30, s: "1-1", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Avustralya'nın tamamen fiziğe dayalı B planı Türkiye'nin pas geometrisini bozar. <br><b>SAĞLIK:</b> 65'te biriken laktik asit Türkiye'nin yaratıcılığını köreltir, maç bir hava topu savaşına döner." },
+                kaos: { prob: 15, s: "1-0", ht: "1-0", r: "1", t: "KAOS", reason: "<b>VERİ:</b> Avustralya 0.10 xG değerine sahip bir karambol/duran toptan gol bulur. <br><b>SOYUNMA ODASI:</b> Türkiye'nin kriz yönetimi iflas eder; son 20 dakika şuursuz uzun toplarla heba olur." }
+            },
+            {
+                id: 9, g: "E", d: "14.06", h: "Almanya", hf: "🇩🇪", a: "Curaçao", af: "🇨🇼",
+                muhtemel: { prob: 75, s: "4-0", ht: "2-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Nagelsmann'ın 4-2-3-1 akışkan pozisyon oyunu sahanın her santimetresini domine eder. <br><b>SAĞLIK:</b> Kusursuz Alman yük yönetimi sıfır hücresel yorgunluk sağlar. <br><b>SOYUNMA ODASI:</b> Almanların rehavete kapılmasını engelleyen o ünlü makine kas hafızası. <br><b>X-FAKTÖR:</b> Musiala ve Wirtz tüm mikro eşleşmeleri açık ara kazanır. <br><b>VERİ:</b> İnanılmaz bir xG uçurumu. <br><b>TARİHSEL:</b> 1. Torba ile 4. Torba eşleşmelerinde favorinin %95 kazanma oranı." },
+                surpriz: { prob: 15, s: "1-0", ht: "0-0", r: "1", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Curaçao ceza sahasına 10 kişilik bir duvar örer. <br><b>VERİ:</b> Almanya %85 topla oynar ama sürekli direklere ve savunmaya takılır. <br><b>SAĞLIK:</b> Almanya sakatlık riskini önlemek için rölantiye geçer." },
+                kaos: { prob: 10, s: "1-1", ht: "1-0", r: "X", t: "KAOS", reason: "<b>X-FAKTÖR:</b> Curaçao kalecisi hayatının maçını oynayarak bir veri anomalisi yaratır. <br><b>HAKEM:</b> 94. dakikada VAR'ın tespit ettiği tesadüfi bir elle oynama Curaçao'ya tarihinin en büyük beraberliğini getirir." }
+            },
+            {
+                id: 10, g: "E", d: "14.06", h: "Fildişi Sahili", hf: "🇨🇮", a: "Ekvador", af: "🇪🇨",
+                muhtemel: { prob: 50, s: "1-2", ht: "0-1", r: "2", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Ekvador'un yüksek oktanlı dikey geçişleri Fildişi'nin savunma boşluklarını sömürür. <br><b>SAĞLIK:</b> Ekvador'un rakım/kondisyon genetiği, Fildişi'nin 70. dakika yorgunluğunu kolayca aşar. <br><b>SOYUNMA ODASI:</b> Ekvador'un genç takım uyumu, Fildişi'nin bireysel yeteneklerinin önüne geçer. <br><b>X-FAKTÖR:</b> Kendry Páez hatlar arasındaki kilidi açar. <br><b>VERİ:</b> Ekvador'un agresif PPDA metrikleri rakip oyun kurulumunu boğar. <br><b>DNA:</b> Güney Amerika'nın o bilindik taktiksel direnci." },
+                surpriz: { prob: 30, s: "1-1", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Tam bir fiziksel satranç. İki takımın da pres tetikleyicileri birbirini kusursuz kilitler. <br><b>SAĞLIK:</b> Yüksek nem 60'tan sonra her iki takımı da düşük riskli, yürüyüş temposunda bir B planına zorlar." },
+                kaos: { prob: 20, s: "2-0", ht: "1-0", r: "1", t: "KAOS", reason: "<b>X-FAKTÖR:</b> Fildişi Sahili analistleri (scout) kanatlarda spesifik bir eşleşme zafiyeti tespit eder ve oyunun akışına ters iki patlayıcı kontrayla maçı koparır." }
+            },
+            {
+                id: 11, g: "F", d: "14.06", h: "Hollanda", hf: "🇳🇱", a: "Japonya", af: "🇯🇵",
+                muhtemel: { prob: 55, s: "2-1", ht: "1-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> Koeman'ın katı pozisyonel oyunu Japonya'nın kinetik presini boşa çıkarır. <br><b>SAĞLIK:</b> Hollanda'nın üst düzey fonksiyonel kondisyonu Japonların sprintlerini emer. <br><b>SOYUNMA ODASI:</b> Van Dijk liderliği maç sonu paniğini engeller. <br><b>VERİ:</b> Hollanda'nın duran top xG'si açık oyundaki eksikliklerini fazlasıyla kapatır. <br><b>DNA:</b> Avrupa pragmatizmi. <br><b>HAKEM:</b> Standart Avrupa faul eşiği Japonya'nın hızlı geçişlerini taktik faullerle kesmeye izin verir." },
+                surpriz: { prob: 25, s: "1-1", ht: "1-1", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Moriyasu'nun orta bloğu Hollanda orta sahası ile forvetleri arasındaki bağı tamamen koparır. <br><b>VERİ:</b> Maç xA ve PPDA metriklerinde mükemmel bir eşitlikle tam bir taktiksel kilitlenmeyle biter." },
+                kaos: { prob: 20, s: "1-2", ht: "0-1", r: "2", t: "KAOS", reason: "<b>DNA:</b> Japonya'nın Dünya Kupası dev avcısı refleksi tekrar tetiklenir. <br><b>X-FAKTÖR:</b> Japonya'nın 70'ten sonra oyuna giren genç ve taze kanatları, yorulan Hollanda defansında iki şok geçiş golü bulur." }
+            },
+            {
+                id: 12, g: "F", d: "15.06", h: "İsveç", hf: "🇸🇪", a: "Tunus", af: "🇹🇳",
+                muhtemel: { prob: 60, s: "1-0", ht: "0-0", r: "1", t: "MUHTEMEL", reason: "<b>TAKTİK:</b> İsveç'in yapısal sabrı Tunus'un alçak bloğunu yavaş yavaş aşındırır. <br><b>SAĞLIK:</b> İskandinav soğukkanlılığı ve dayanıklılığı Kuzey Afrika ateşini maç sonunda söndürür. <br><b>X-FAKTÖR:</b> Isak'ın duran toplardaki ve hava toplarındaki mutlak hakimiyeti. <br><b>VERİ:</b> İsveç kornerlerden ekstrem xG üretir. <br><b>HAKEM:</b> Hakem, Tunus'un zaman geçirme ve taktik faullerini sarı kartlarla cezalandırarak baskıyı kırar." },
+                surpriz: { prob: 30, s: "0-0", ht: "0-0", r: "X", t: "SÜRPRİZ", reason: "<b>TAKTİK:</b> Tunus'un savunma geometrisi kusursuz işler. <br><b>HAKEM:</b> İkili mücadelelere çok izin veren hakem, Tunus'un İsveç ritmini kart görmeden bozmasına olanak tanır. <br><b>VERİ:</b> 0.4'e 0.3 xG ile klasik bir kilitlenme." },
+                kaos: { prob: 10, s: "0-1", ht: "0-0", r: "2", t: "KAOS", reason: "<b>X-FAKTÖR:</b> Tunus maçın gidişatına tamamen ters tek bir uzun topla kaleciyle karşı karşıya kalır. <br><b>SOYUNMA ODASI:</b> İsveç şoka girer, B planını unutarak kontrolsüz ve kaotik bir hücum furyasına tutulup eli boş döner." }
+            }
+        ];
+
+        let selectedMatchIds = [];
+        let systemState = "SELECTION";
+        let activeMatchModes = {};
+
+        function renderPool() {
+            const poolContainer = document.getElementById("available-pool");
+            poolContainer.innerHTML = "";
+
+            if (systemState === "SELECTION") {
+                const visibleNodes = dataset.filter(node => !selectedMatchIds.includes(node.id));
+
+                if (visibleNodes.length === 0) {
+                    poolContainer.innerHTML = `<div class="col-span-full p-8 text-center text-slate-600 font-bold uppercase tracking-widest">[ HAVUZ BOŞALDI: TÜM MAÇLAR İSTASYONA SEVK EDİLDİ ]</div>`;
+                    return;
+                }
+
+                visibleNodes.forEach(node => {
+                    const card = document.createElement("div");
+                    card.className = "border border-slate-800 bg-slate-950/50 backdrop-blur-md p-5 rounded-2xl cursor-pointer hover:border-cyan-500/50 hover:bg-slate-900/30 transition-all duration-300 text-center relative flex flex-col justify-between space-y-3 group shadow-lg";
+                    card.onclick = () => selectMatch(node.id);
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center text-[10px] text-slate-500 tracking-wider font-bold mono-text border-b border-slate-900 pb-1.5">
+                            <span>GRP_${node.g}</span>
+                            <span class="text-cyan-500/70">${node.d}</span>
+                        </div>
+                        <div class="flex items-center justify-center space-x-4 py-2">
+                            <div class="text-center flex-1">
+                                <span class="text-3xl block filter drop-shadow-md transform group-hover:scale-110 transition-transform duration-300">${node.hf}</span>
+                                <span class="text-xs font-bold text-white block mt-1 tracking-wide truncate">${node.h}</span>
+                            </div>
+                            <span class="text-slate-600 font-bold tracking-widest text-[10px] mono-text">VS</span>
+                            <div class="text-center flex-1">
+                                <span class="text-3xl block filter drop-shadow-md transform group-hover:scale-110 transition-transform duration-300">${node.af}</span>
+                                <span class="text-xs font-bold text-slate-400 block mt-1 tracking-wide truncate">${node.a}</span>
+                            </div>
+                        </div>
+                        <div class="text-[9px] text-slate-600 uppercase tracking-widest font-bold pt-1.5 border-t border-slate-900/40 group-hover:text-cyan-500 transition-colors">
+                            [ SEÇİM İÇİN TIKLAYIN ]
+                        </div>
+                    `;
+                    poolContainer.appendChild(card);
+                });
+            } else {
+                const confirmedNodes = dataset.filter(node => selectedMatchIds.includes(node.id));
+
+                confirmedNodes.forEach(node => {
+                    const card = document.createElement("div");
+
+                    if (systemState === "CONFIRMED") {
+                        card.className = "border border-slate-800 bg-slate-950/70 backdrop-blur-md p-6 rounded-2xl text-center relative flex flex-col justify-between space-y-4 shadow-xl animate-fly-up";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center text-[10px] text-slate-500 tracking-wider font-bold mono-text border-b border-slate-900 pb-2">
+                                <span>GRP_${node.g}</span>
+                                <span class="text-slate-500">${node.d}</span>
+                            </div>
+                            <div class="flex items-center justify-center space-x-6 py-2">
+                                <div class="text-center flex-1">
+                                    <span class="text-4xl block filter drop-shadow">${node.hf}</span>
+                                    <span class="text-sm font-bold text-white block mt-1 tracking-wide truncate">${node.h}</span>
+                                </div>
+                                <span class="text-slate-700 font-black tracking-widest text-xs mono-text">VS</span>
+                                <div class="text-center flex-1">
+                                    <span class="text-4xl block filter drop-shadow">${node.af}</span>
+                                    <span class="text-sm font-bold text-slate-400 block mt-1 tracking-wide truncate">${node.a}</span>
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-cyan-500/50 font-bold tracking-widest uppercase py-2.5 bg-slate-900/40 rounded-xl border border-cyan-900/30 mono-text animate-pulse">
+                                [ MATRİS YÜKLENİYOR... ]
+                            </div>
+                        `;
+                    } else if (systemState === "GENERATED") {
+                        const mode = activeMatchModes[node.id];
+                        let data, cardColorClass, textColorClass;
+
+                        if (mode === "MUHTEMEL") {
+                            data = node.muhtemel;
+                            cardColorClass = 'hud-glow-cyan bg-cyan-950/[0.05] border-cyan-500/30';
+                            textColorClass = 'text-cyan-400';
+                        } else if (mode === "SURPRIZ") {
+                            data = node.surpriz;
+                            cardColorClass = 'hud-glow-amber bg-amber-950/[0.05] border-amber-500/40';
+                            textColorClass = 'text-amber-400';
+                        } else if (mode === "KAOS") {
+                            data = node.kaos;
+                            cardColorClass = 'hud-glow-rose bg-rose-950/[0.05] border-rose-500/40 surprise-flash';
+                            textColorClass = 'text-rose-400';
+                        }
+
+                        card.className = `border bg-slate-950/80 backdrop-blur-md p-6 rounded-2xl cursor-pointer transition-all duration-300 text-center relative flex flex-col justify-between space-y-4 shadow-2xl animate-fly-up hover:scale-[1.02] ${cardColorClass}`;
+                        card.onclick = () => openReasoningModal(node.id);
+
+                        let resBadge = "border-slate-800 text-slate-400";
+                        if(data.r === "1") resBadge = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+                        else if(data.r === "X") resBadge = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                        else if(data.r === "2") resBadge = "bg-rose-500/10 text-rose-400 border-rose-500/20";
+
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center text-[10px] text-slate-500 tracking-wider font-bold mono-text border-b border-slate-900 pb-2">
+                                <span>GRP_${node.g}</span>
+                                <span class="${textColorClass}">${node.d}</span>
+                            </div>
+                            <div class="flex items-center justify-center space-x-6 py-2">
+                                <div class="text-center flex-1">
+                                    <span class="text-4xl block filter drop-shadow-md">${node.hf}</span>
+                                    <span class="text-sm font-bold text-white block mt-1 tracking-wide truncate">${node.h}</span>
+                                </div>
+                                <span class="text-slate-600 font-black tracking-widest text-xs mono-text">VS</span>
+                                <div class="text-center flex-1">
+                                    <span class="text-4xl block filter drop-shadow-md">${node.af}</span>
+                                    <span class="text-sm font-bold text-slate-300 block mt-1 tracking-wide truncate">${node.a}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-4 gap-2 bg-slate-950/80 p-2.5 rounded-xl border border-slate-900/60 text-center select-none items-center">
+                                <div>
+                                    <span class="block text-[8px] font-bold text-slate-500 uppercase tracking-wider">İLK YARI</span>
+                                    <span class="text-slate-300 font-bold mono-text text-[11px]">${data.ht}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[8px] font-bold text-slate-500 uppercase tracking-wider">SKOR</span>
+                                    <span class="${textColorClass} font-black mono-text text-[13px]">${data.s}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[8px] font-bold text-slate-500 uppercase tracking-wider">SONUÇ</span>
+                                    <span class="px-1.5 py-0.5 rounded border text-[10px] font-black mono-text ${resBadge}">${data.r}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[8px] font-bold text-slate-500 uppercase tracking-wider">SENARYO</span>
+                                    <span class="text-[9px] font-bold mono-text tracking-tight block truncate ${textColorClass}">${data.t.split(' ')[0]}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    poolContainer.appendChild(card);
+                });
+            }
+        }
+
+        function renderDeck() {
+            const deck = document.getElementById("selected-deck");
+            const placeholder = document.getElementById("deck-placeholder");
+
+            if (selectedMatchIds.length === 0) {
+                deck.innerHTML = "";
+                deck.appendChild(placeholder);
+                placeholder.classList.remove("hidden");
+                return;
+            }
+
+            if (placeholder) placeholder.classList.add("hidden");
+
+            const cardsInDeck = deck.querySelectorAll(".deck-card");
+            cardsInDeck.forEach(c => c.remove());
+
+            selectedMatchIds.forEach(id => {
+                const node = dataset.find(m => m.id === id);
+                if (!node) return;
+
+                const card = document.createElement("div");
+                card.className = "deck-card animate-fly-up border border-slate-800 bg-slate-900/80 px-4 py-2.5 rounded-xl flex items-center space-x-3 transition-all duration-300 select-none max-w-xs cursor-pointer hover:border-rose-500/40 hover:bg-rose-950/20";
+                card.onclick = () => deselectMatch(node.id);
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl filter drop-shadow">${node.hf}</span>
+                        <span class="text-[10px] font-black text-slate-500">x</span>
+                        <span class="text-xl filter drop-shadow">${node.af}</span>
+                    </div>
+                    <div class="text-left leading-tight">
+                        <span class="text-[10px] font-bold text-white block truncate max-w-[80px]">${node.h}</span>
+                        <span class="text-[8px] text-slate-500 block mono-text">${node.d}</span>
+                    </div>
+                `;
+                deck.appendChild(card);
+            });
+        }
+
+        function selectMatch(id) {
+            if (systemState !== "SELECTION") return;
+            if (!selectedMatchIds.includes(id)) {
+                selectedMatchIds.push(id);
+                renderPool();
+                renderDeck();
+            }
+        }
+
+        function deselectMatch(id) {
+            if (systemState !== "SELECTION") return;
+            selectedMatchIds = selectedMatchIds.filter(mId => mId !== id);
+            renderPool();
+            renderDeck();
+        }
+
+        function confirmMatches() {
+            if (selectedMatchIds.length === 0) {
+                alert("Lütfen önce havuzdan en az bir maç kartı seçin!");
+                return;
+            }
+
+            systemState = "CONFIRMED";
+
+            document.getElementById("sys-mode").innerText = "ANALİZ SENTEZLENİYOR";
+            document.getElementById("sys-mode").className = "text-amber-400";
+            document.getElementById("system-guideline").innerHTML = `⚡ <span class="text-amber-400 font-bold">A.I. MATRIX:</span> Seçilen maçlar algoritma tüneline sokuldu. Matrisi çalıştırmak için <span class="text-white font-bold">"Tahmin Yürüt"</span> butonuna basın.`;
+
+            document.getElementById("selected-deck-container").classList.add("hidden");
+            document.getElementById("btn-confirm").classList.add("hidden");
+
+            document.getElementById("pool-title").innerText = "MİKRO EŞLEŞMELER HAZIR (BEKLEMEDE)";
+
+            const btnGen = document.getElementById("btn-generate");
+            btnGen.classList.remove("hidden", "opacity-20");
+            btnGen.disabled = false;
+            btnGen.className += " bg-cyan-500 text-black font-black hover:bg-cyan-400 cursor-pointer shadow-lg shadow-cyan-500/30";
+
+            renderPool();
+        }
+
+        function generateHybridPredictions() {
+            systemState = "GENERATED";
+
+            selectedMatchIds.forEach((id) => {
+                const matchInfo = dataset.find(m => m.id === id);
+                const rand = Math.random() * 100;
+                let cumulativeProb = 0;
+
+                cumulativeProb += matchInfo.muhtemel.prob;
+                if (rand <= cumulativeProb) {
+                    activeMatchModes[id] = "MUHTEMEL";
+                    return;
+                }
+
+                cumulativeProb += matchInfo.surpriz.prob;
+                if (rand <= cumulativeProb) {
+                    activeMatchModes[id] = "SURPRIZ";
+                    return;
+                }
+
+                activeMatchModes[id] = "KAOS";
+            });
+
+            const mainHub = document.getElementById("main-header");
+            mainHub.className = mainHub.className.replace(/hud-glow-(cyan|amber|rose)/, "hud-glow-cyan");
+
+            document.getElementById("sys-mode").innerText = "SİMÜLASYON TAMAMLANDI";
+            document.getElementById("sys-mode").className = "text-cyan-400";
+            document.getElementById("system-guideline").innerHTML = `✔️ <span class="text-cyan-400 font-bold">İŞLEM BAŞARILI:</span> Olasılık zar atışları tamamlandı. Alt taraftaki kartların <span class="text-white font-bold">üzerine tıklayarak</span> yapay zeka yorumunu okuyabilirsiniz.`;
+
+            document.getElementById("pool-title").innerText = "A.I. ÜRETİMİ SENARYOLAR";
+
+            renderPool();
+        }
+
+        function openReasoningModal(id) {
+            const matchNode = dataset.find(m => m.id === id);
+            if (!matchNode) return;
+
+            const mode = activeMatchModes[id];
+            let specificData;
+            let probText = "";
+            let colorClass = "";
+            let badgeBgClass = "";
+
+            const modal = document.getElementById("reasoning-modal");
+            const badge = document.getElementById("modal-badge");
+            const teams = document.getElementById("modal-teams");
+            const ht = document.getElementById("modal-ht");
+            const score = document.getElementById("modal-score");
+            const res = document.getElementById("modal-res");
+            const text = document.getElementById("modal-text");
+            const modalContent = modal.firstElementChild;
+
+            modalContent.className = modalContent.className.replace(/border-(cyan|amber|rose)-500\/[0-9]{2}/g, "border-slate-800");
+            modalContent.className = modalContent.className.replace(/hud-glow-(cyan|amber|rose)/g, "");
+
+            if (mode === "MUHTEMEL") {
+                specificData = matchNode.muhtemel;
+                probText = "%" + specificData.prob;
+                colorClass = "text-cyan-400";
+                badgeBgClass = "bg-cyan-500/20 border-cyan-500/40";
+                badge.innerText = "SİMÜLASYON: MUHTEMEL";
+                modalContent.classList.add("border-cyan-500/30", "hud-glow-cyan");
+            } else if (mode === "SURPRIZ") {
+                specificData = matchNode.surpriz;
+                probText = "%" + specificData.prob;
+                colorClass = "text-amber-400";
+                badgeBgClass = "bg-amber-500/20 border-amber-500/40";
+                badge.innerText = "SİMÜLASYON: SÜRPRİZ";
+                modalContent.classList.add("border-amber-500/30", "hud-glow-amber");
+            } else if (mode === "KAOS") {
+                specificData = matchNode.kaos;
+                probText = "%" + specificData.prob;
+                colorClass = "text-rose-400";
+                badgeBgClass = "bg-rose-500/20 border-rose-500/40";
+                badge.innerText = "SİMÜLASYON: KAOS";
+                modalContent.classList.add("border-rose-500/40", "hud-glow-rose");
+            }
+
+            badge.className = `px-2 py-0.5 rounded text-[10px] font-bold border mono-text ${colorClass} ${badgeBgClass}`;
+            score.className = `${colorClass} font-black mono-text text-xl tracking-widest`;
+
+            teams.innerText = `${matchNode.h} vs ${matchNode.a}`;
+            ht.innerText = specificData.ht;
+            score.innerText = specificData.s;
+            res.innerText = specificData.r;
+
+            text.innerHTML = `
+                <div class="flex flex-col space-y-4">
+                    <div class="inline-flex items-center space-x-2 border border-slate-700/50 bg-slate-900/80 px-3 py-1.5 rounded-lg w-max shadow-sm">
+                        <div class="h-1.5 w-1.5 rounded-full ${colorClass.replace('text', 'bg')} animate-pulse shadow-[0_0_8px_currentColor]"></div>
+                        <span class="${colorClass} font-black mono-text text-[10px] tracking-widest">HESAPLANAN OLASILIK: ${probText}</span>
+                    </div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed text-left space-y-1">
+                        ${specificData.reason}
+                    </p>
+                </div>
+            `;
+
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                modalContent.classList.remove("scale-95");
+            }, 20);
+        }
+
+        function closeReasoningModal() {
+            const modal = document.getElementById("reasoning-modal");
+            modal.classList.add("opacity-0");
+            modal.firstElementChild.classList.add("scale-95");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeReasoningModal();
+        });
+
+        window.onload = function() {
+            renderPool();
+            renderDeck();
+        };
+    </script>
+</body>
+</html>
