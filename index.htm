@@ -149,18 +149,18 @@
                 <button onclick="closeReasoningModal()" class="text-slate-500 hover:text-white transition-colors tracking-widest font-bold text-[10px] mono-text">&times; CLOSE</button>
             </div>
             <div>
-                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text mb-1">TARGET NODES</p>
+                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text mb-1">SEÇİLEN MAÇ</p>
                 <div id="modal-teams" class="text-base font-extrabold text-white tracking-wide">Home vs Away</div>
             </div>
             <div>
-                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text mb-1">PREDICTION MATRIX DATA</p>
+                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text mb-1">ÜRETİLEN TAHMİNLER</p>
                 <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-center">
                     <div>
-                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">İLK YARI</span>
+                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">İLK YARI SKORU</span>
                         <span id="modal-ht" class="text-slate-300 font-bold mono-text">0-0</span>
                     </div>
                     <div>
-                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">TAHMİN SKORU</span>
+                        <span class="block text-slate-500 text-[9px] font-bold tracking-wider">MAÇ SONU SKORU</span>
                         <span id="modal-score" class="text-cyan-400 font-bold mono-text text-sm">0-0</span>
                     </div>
                     <div>
@@ -170,14 +170,14 @@
                 </div>
             </div>
             <div class="space-y-1">
-                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text">ALGORITHMIC REASONING</p>
+                <p class="text-slate-500 uppercase tracking-widest text-[9px] font-bold mono-text">YAPAY ZEKA YORUMLARI</p>
                 <p id="modal-text" class="text-slate-300 leading-relaxed bg-slate-950/50 p-4 border border-slate-800/50 rounded-xl">
                     Veri işleniyor...
                 </p>
             </div>
             <div class="pt-2">
                 <button onclick="closeReasoningModal()" class="w-full bg-cyan-500 text-black font-black py-2.5 rounded-xl transition-all duration-200 uppercase tracking-wider text-[11px] hover:bg-cyan-400">
-                    Raporu Onayla
+                    KAPAT
                 </button>
             </div>
         </div>
@@ -455,12 +455,12 @@
 
             if(isSurpriseActive) {
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 mono-text";
-                badge.innerText = "TRACE: ANOMALY_DETECTION";
+                badge.innerText = "TAHMIN TIPI: SURPRIZ";
                 score.className = "text-amber-400 font-black mono-text text-base tracking-widest";
                 modal.firstElementChild.className = modal.firstElementChild.className.replace("border-cyan-500/30", "border-amber-500/50").replace("glow-green", "hud-glow-amber");
             } else {
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 mono-text";
-                badge.innerText = "TRACE: RATIONAL_STREAM";
+                badge.innerText = "TAHMIN TIPI: MUHTEMEL";
                 score.className = "text-cyan-400 font-black mono-text text-base tracking-widest";
                 modal.firstElementChild.className = modal.firstElementChild.className.replace("border-amber-500/50", "border-cyan-500/30").replace("hud-glow-amber", "glow-green");
             }
